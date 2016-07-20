@@ -1,0 +1,11 @@
+concejo_rol:
+    type: rest
+    prefix: /api
+    resource: "ConcejoBundle\Controller\RolController"
+    name_prefix:  api_ # naming collision  
+
+concejo_usuario:
+    type: rest
+    prefix: /api
+    resource: "ConcejoBundle\Controller\\UsuarioController"
+    name_prefix:  api_ # naming collision 

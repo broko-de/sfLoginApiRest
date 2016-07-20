@@ -1,0 +1,86 @@
+# To get started with security, check out the documentation:
+# http://symfony.com/doc/current/book/security.html
+security:
+
+    encoders:
+        ConcejoBundle\Entity\Usuario: 
+            algorithm: sha512
+            encode-as-base64: true
+            iterations: 10
+            
+    #encoders:
+    #    Symfony\Component\Security\Core\User\User: plaintext 
+    
+    role_hierarchy:
+        ROLE_ADMIN: ROLE_ADMIN
+        ROLE_SUPER_ADMIN: [ROLE_USER, ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
+        
+    # http://symfony.com/doc/current/book/security.html#where-do-users-come-from-user-providers
+    #providers:
+    #    api_user_provider:
+    #        id: api_user_provider
+    providers:
+        db_concejo:
+            entity: {class: ConcejoBundle\Entity\Usuario, property: dni}
+    #providers:
+    #    in_memory:
+    #        memory:
+    #            users:
+    #                user: {password: userpass, roles: ['ROLE_USER', 'ROLE_API']}
+    #                admin: {password: adminpass, roles: ['ROLE_ADMIN', 'ROLE_API']}
+
+    firewalls:
+        # disables authentication for assets and the profiler, adapt it according to your needs
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+            
+        login:
+            pattern:  ^/api/login
+            stateless: true
+            anonymous: true
+            provider: db_concejo
+            form_login:
+                check_path:               /api/login_check
+                success_handler:          lexik_jwt_authentication.handler.authentication_success
+                failure_handler:          lexik_jwt_authentication.handler.authentication_failure
+                require_previous_session: false
+            logout:
+                path:       /api/logout
+                target:     /
+        
+        api:
+            pattern:   ^/api
+            stateless: true
+            lexik_jwt:
+                authorization_header: # check token in Authorization Header
+                    enabled: true
+                    prefix:  Bearer
+                throw_exceptions:        false     # When an authentication failure occurs, return a 401 response immediately
+                create_entry_point:      true      # When no authentication details are provided, create a default entry point that returns a 401 response
+                authentication_provider: lexik_jwt_authentication.security.authentication.provider    
+            
+        #secured_area:
+        #    pattern: ^/api
+        #    anonymous: ~
+        #    http_basic:
+        #        realm: "Tendrias q haber completado nombre y password"
+        
+        default:
+            pattern: ^/public
+            anonymous: ~
+                
+                
+        main:
+            anonymous: ~
+            # activate different ways to authenticate
+
+            # http_basic: ~
+            # http://symfony.com/doc/current/book/security.html#a-configuring-how-your-users-will-authenticate
+
+            # form_login: ~
+            # http://symfony.com/doc/current/cookbook/security/form_login_setup.html
+    access_control:
+    - { path: ^/api/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+    - { path: ^/public, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+    - { path: ^/api/usuarios, roles: [ROLE_ADMIN] }

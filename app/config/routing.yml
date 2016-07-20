@@ -1,0 +1,10 @@
+concejo:
+    resource: "@ConcejoBundle/Controller/"
+    type:     annotation
+    prefix:   /
+
+api_login_check:
+    path: /api/login_check
+    
+logout:
+    path:     /api/logout

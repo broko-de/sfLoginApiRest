@@ -1,0 +1,15 @@
+parameters:
+    ### ROL ###
+    concejo_rol.handler.class: ConcejoBundle\Handler\RolHandler
+    concejo.rol.class: ConcejoBundle\Entity\Rol
+    ### USUARIO ###
+    concejo_usuario.handler.class: ConcejoBundle\Handler\UsuarioHandler
+    concejo.usuario.class: ConcejoBundle\Entity\Usuario
+
+services:        
+    concejo.rol.handler: 
+        class: %concejo_rol.handler.class%
+        arguments: [@doctrine.orm.entity_manager,%concejo.rol.class%]        
+    concejo.usuario.handler: 
+        class: %concejo_usuario.handler.class%
+        arguments: [@doctrine.orm.entity_manager,%concejo.usuario.class%,@form.factory,@security.context] 
